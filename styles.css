@@ -1,0 +1,238 @@
+/*
+ * Menard styles (DESIGN.md §9.9). Only the classes and data attributes in
+ * src/constants.ts are styled, through --menard-* variables derived from
+ * Obsidian's, so every theme, light or dark, applies. Highlights change
+ * background, decoration and outline only: never font metrics or padding,
+ * so highlighting never reflows text.
+ */
+
+body {
+	--menard-current-bg: var(--text-highlight-bg);
+	--menard-accent: var(--interactive-accent);
+	--menard-partner-bg: color-mix(in srgb, var(--interactive-accent) 16%, transparent);
+	--menard-hover-line: var(--text-muted);
+	--menard-warning: var(--text-warning);
+	--menard-rule: var(--background-modifier-border);
+	--menard-gloss-text: var(--text-muted);
+	--menard-gloss-bg: var(--background-secondary);
+	--menard-ghost-bg: var(--background-primary);
+	--menard-ghost-shadow: var(--shadow-s);
+	--menard-radius: var(--radius-s);
+	--menard-underline: 2px;
+	--menard-transition: 120ms ease-out;
+}
+
+/* Dark themes: the theme's highlight color is too dim behind light text. */
+.theme-dark {
+	--menard-current-bg: rgba(var(--color-yellow-rgb), 0.3);
+	--menard-partner-bg: color-mix(in srgb, var(--interactive-accent) 34%, transparent);
+}
+
+
+/* ─── Sentence fragments ─────────────────────────────────────────────────── */
+
+.menard-s {
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	border-radius: var(--menard-radius);
+	text-underline-offset: 0.22em;
+	transition: background-color var(--menard-transition);
+}
+
+.menard-s.menard-current {
+	background-color: var(--menard-current-bg);
+	text-decoration: underline solid var(--menard-accent) var(--menard-underline);
+}
+
+.menard-s.menard-partner {
+	background-color: var(--menard-partner-bg);
+}
+
+.menard-s.menard-hover:not(.menard-current) {
+	text-decoration: underline dotted var(--menard-hover-line) var(--menard-underline);
+}
+
+.menard-s.menard-loose,
+.menard-s.menard-approx {
+	text-decoration: underline dashed var(--menard-hover-line) 1px;
+}
+
+.menard-s.menard-flagged {
+	text-decoration: underline wavy var(--menard-warning) 1px;
+}
+
+/* State shapes win over the fit marks while they are shown. */
+.menard-s.menard-current.menard-loose,
+.menard-s.menard-current.menard-approx,
+.menard-s.menard-current.menard-flagged {
+	text-decoration: underline solid var(--menard-accent) var(--menard-underline);
+}
+
+/* ─── Whole units (no usable sentence map) ───────────────────────────────── */
+
+[data-menard-unit] {
+	transition: background-color var(--menard-transition);
+}
+
+.menard-unit-current {
+	background-color: var(--menard-current-bg);
+	outline: var(--menard-underline) solid var(--menard-accent);
+	outline-offset: 2px;
+	border-radius: var(--menard-radius);
+}
+
+.menard-unit-partner {
+	background-color: var(--menard-partner-bg);
+	border-radius: var(--menard-radius);
+}
+
+[data-menard-unit].menard-hover:not(.menard-unit-current) {
+	outline: 1px dotted var(--menard-hover-line);
+	outline-offset: 2px;
+}
+
+/* ─── Menard lines ───────────────────────────────────────────────────────── */
+
+/*
+ * Collapsed, not display: none. Obsidian's reading view measures each section
+ * from its offsetTop; a display: none section reports 0, which gives it and the
+ * next section huge opposite heights and breaks applyScroll and virtualization.
+ * No overflow: hidden either: that would stop the paragraph margins on either
+ * side from collapsing through the empty section, doubling the gap.
+ */
+[data-menard-line] {
+	height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+[data-menard-line] > * {
+	display: none;
+}
+
+/* ─── Stacked view ───────────────────────────────────────────────────────── */
+
+.menard-stacked [data-menard-unit] {
+	position: relative;
+}
+
+.menard-gloss {
+	display: block;
+	margin-block: 0.4em 0.6em;
+	padding-inline-start: 0.75em;
+	border-inline-start: 2px solid var(--menard-accent);
+	background-color: var(--menard-gloss-bg);
+	border-radius: var(--menard-radius);
+	color: var(--menard-gloss-text);
+}
+
+.menard-gloss.menard-concealed {
+	height: 0;
+	overflow: hidden;
+	padding: 0;
+	border: none;
+	border-block-start: 1px dashed var(--menard-rule);
+	background: none;
+}
+
+/* Absolute with automatic block offsets: the card sits at its static spot under the line and never reflows text. */
+.menard-ghost {
+	position: absolute;
+	inset-inline: 0;
+	z-index: var(--layer-popover);
+	display: block;
+	margin-block-start: 0.25em;
+	padding: 0.4em 0.75em;
+	background-color: var(--menard-ghost-bg);
+	border: 1px solid var(--menard-rule);
+	border-radius: var(--menard-radius);
+	box-shadow: var(--menard-ghost-shadow);
+	color: var(--menard-gloss-text);
+	pointer-events: none;
+}
+
+/* ─── Accessibility ──────────────────────────────────────────────────────── */
+
+@media (forced-colors: active) {
+	.menard-s.menard-current,
+	.menard-unit-current {
+		outline: 2px solid Highlight;
+		outline-offset: 1px;
+	}
+
+	.menard-s.menard-partner,
+	.menard-unit-partner {
+		outline: 2px dashed Highlight;
+		outline-offset: 1px;
+	}
+
+	.menard-s.menard-hover,
+	[data-menard-unit].menard-hover {
+		outline: 1px dotted CanvasText;
+	}
+
+	.menard-s.menard-flagged {
+		text-decoration-color: Mark;
+	}
+
+	.menard-gloss {
+		border-inline-start-color: Highlight;
+	}
+
+	.menard-gloss.menard-concealed {
+		border-block-start-color: CanvasText;
+	}
+
+	.menard-ghost {
+		border-color: CanvasText;
+	}
+}
+
+/* ─── Notices and modals ─────────────────────────────────────────────────── */
+
+.menard-notice-action {
+	margin-block-start: var(--size-4-2);
+	margin-inline-end: var(--size-4-2);
+}
+
+.menard-preflight input[aria-invalid="true"] {
+	border-color: var(--menard-warning);
+	box-shadow: 0 0 0 1px var(--menard-warning);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.menard-s,
+	[data-menard-unit] {
+		transition: none;
+	}
+}
+
+.menard-report-text {
+	width: 100%;
+	font-family: var(--font-monospace);
+	font-size: var(--font-smallest);
+	resize: vertical;
+}
+
+/* ─── Fade other sentences ───────────────────────────────────────────────── */
+
+/* Only in a Menard pane that has a current or partner mark, so nothing fades before the cursor exists. */
+.menard-dim-inactive :is([data-menard-role], .menard-stacked):has(.menard-current, .menard-partner, .menard-unit-current, .menard-unit-partner)
+	:is(.menard-s:not(.menard-current, .menard-partner), [data-menard-unit]:not(.menard-unit-current, .menard-unit-partner):not(:has(.menard-s))) {
+	opacity: var(--menard-dim-opacity, 0.5);
+	transition: opacity 120ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.menard-dim-inactive .menard-s,
+	.menard-dim-inactive [data-menard-unit] {
+		transition: none;
+	}
+}
+
+.menard-import-links {
+	width: 100%;
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-small);
+}

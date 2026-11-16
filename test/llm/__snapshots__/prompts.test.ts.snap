@@ -1,0 +1,418 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`alignPrompt > matches the snapshot 1`] = `
+{
+  "prompt": "{
+  "source": [
+    {
+      "n": 1,
+      "text": "Según el Sr. Pérez, Borges leyó a Poe."
+    },
+    {
+      "n": 2,
+      "text": "Esa lectura fue decisiva."
+    }
+  ],
+  "target": [
+    {
+      "n": 1,
+      "text": "According to Mr. Pérez, Borges read Poe."
+    },
+    {
+      "n": 2,
+      "text": "He read him in Geneva."
+    },
+    {
+      "n": 3,
+      "text": "That reading was decisive."
+    }
+  ]
+}
+
+Your previous answer was rejected: target sentence 2 is missing. Return corrected JSON.",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "groups": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "loose": {
+              "type": "boolean",
+            },
+            "src": {
+              "items": {
+                "minimum": 1,
+                "type": "integer",
+              },
+              "type": "array",
+            },
+            "tgt": {
+              "items": {
+                "minimum": 1,
+                "type": "integer",
+              },
+              "type": "array",
+            },
+          },
+          "required": [
+            "src",
+            "tgt",
+            "loose",
+          ],
+          "type": "object",
+        },
+        "minItems": 1,
+        "type": "array",
+      },
+    },
+    "required": [
+      "groups",
+    ],
+    "type": "object",
+  },
+  "system": "You align a Spanish text with its existing English translation, sentence by sentence. You never translate or rewrite anything.
+
+The user message is a JSON object with the numbered sentences of one block: "source" in the original and "target" in the translation.
+
+Return only JSON of the form {"groups": [{"src": [1], "tgt": [1, 2], "loose": false}]}.
+
+Rules:
+1. Each group pairs consecutive source sentences with the consecutive target sentences that render them: one to one, one to many or many to one. Keep groups as small as the correspondence allows.
+2. Every source and every target sentence number appears in exactly one group, and the groups follow the order of both texts.
+3. When a stretch on one side has no counterpart on the other, give it its own group with an empty list for the other side instead of forcing a match. Never leave both lists empty.
+4. Every sentence in a group must have its own content rendered on the other side of that group; a shared name (an author cited, the subject of the text) or a single shared word is not a rendering. Test each sentence on its own: one whose content the other side does not render (a quotation, aside or example the translation leaves out, together with its attribution) is its own group with an empty list for the other side, even when its neighbour is rendered. Never fold it into the neighbour's group to avoid an empty list.
+5. For example, source 1 "“Time is a river that carries me away”, writes Borges." and source 2 "Reading, too, carries us off, voraciously." against target 1 "Borges is read voraciously." give {"src": [1], "tgt": [], "loose": false} and {"src": [2], "tgt": [1], "loose": true}: the quotation is not translated, and the shared name does not make it so.
+6. Set "loose" to true when the correspondence is approximate (a free rendering, a partial overlap, or content moved within the group); otherwise false. A faithful translation that changes word order, idiom or punctuation is not loose.
+7. Return sentence numbers only, never text.",
+}
+`;
+
+exports[`outlinePrompt > matches the snapshot and pins the heading count in the schema 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Ficciones",
+  "headings": [
+    "Prólogo",
+    "El jardín de senderos que se bifurcan"
+  ]
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "headings": {
+        "items": {
+          "type": "string",
+        },
+        "maxItems": 2,
+        "minItems": 2,
+        "type": "array",
+      },
+    },
+    "required": [
+      "headings",
+    ],
+    "type": "object",
+  },
+  "system": "You translate the headings of a Spanish document into English.
+
+The user message is a JSON object with "documentTitle" for orientation, the "headings" in document order, and possibly the reader's "extraInstructions", which you follow unless they conflict with the rules below.
+
+Return only JSON of the form {"headings": ["…"]}.
+
+Rules:
+1. Return exactly one heading per input heading, in the same order.
+2. Each heading is one line, without # markers.
+3. Keep numbering, wikilinks [[…]] and Markdown emphasis. Return a heading that needs no translation, such as a proper name, unchanged.",
+}
+`;
+
+exports[`pingPrompt > matches the snapshot 1`] = `
+{
+  "prompt": "Connection check.",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "ok": {
+        "type": "boolean",
+      },
+    },
+    "required": [
+      "ok",
+    ],
+    "type": "object",
+  },
+  "system": "You answer connection checks. Return only the JSON {"ok": true}.",
+}
+`;
+
+exports[`plainPrompt > matches the snapshot for a footnote 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Discusión",
+  "blockKind": "footnote",
+  "markdown": "Véase la carta de 1939."
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "markdown": {
+        "type": "string",
+      },
+    },
+    "required": [
+      "markdown",
+    ],
+    "type": "object",
+  },
+  "system": "You translate one Markdown block (a footnote) from Spanish into English for a bilingual reading edition.
+
+The user message is a JSON object with "documentTitle" for orientation, "blockKind", the block's "markdown", and possibly the reader's "extraInstructions", which you follow unless they conflict with the rules below.
+
+Return only JSON of the form {"markdown": "…"}.
+
+Rules:
+1. Keep the line structure: the same number of lines, line for line. Keep the footnote's blank lines, indentation and quote markers (>) exactly as in the source.
+2. Translate quotations too, and use English quotation marks.
+3. Copy every placeholder such as ⟦^3⟧, ⟦C1⟧, ⟦V1⟧, ⟦U1⟧, ⟦BR⟧ and ⟦P⟧ exactly, as often as it occurs in the source, at the corresponding place. ⟦^…⟧ is a footnote reference, ⟦BR⟧ a line break and ⟦P⟧ a blank line; the others stand for text that must not change.
+4. Copy every wikilink [[…]] exactly as written, including any text after |.
+5. In a Markdown link [label](⟦U1⟧) or [label][⟦U1⟧], translate the label and keep the target.
+6. Keep Markdown emphasis (*, _, **, ==, ~~) on the words that correspond to the emphasized source words.
+7. Translate faithfully and completely in the register of the source. Do not summarize, explain, annotate or add anything.
+8. Never write %% comments or block ids such as ^p12.",
+}
+`;
+
+exports[`plainPrompt > matches the snapshot for a list 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Discusión",
+  "blockKind": "list",
+  "markdown": "- Primera edición (Sur, 1939)."
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "markdown": {
+        "type": "string",
+      },
+    },
+    "required": [
+      "markdown",
+    ],
+    "type": "object",
+  },
+  "system": "You translate one Markdown block (a list) from Spanish into English for a bilingual reading edition.
+
+The user message is a JSON object with "documentTitle" for orientation, "blockKind", the block's "markdown", and possibly the reader's "extraInstructions", which you follow unless they conflict with the rules below.
+
+Return only JSON of the form {"markdown": "…"}.
+
+Rules:
+1. Keep the line structure: the same number of lines, line for line. Keep every line's indentation, list marker (with its number) and task box exactly as in the source.
+2. Translate quotations too, and use English quotation marks.
+3. Copy every placeholder such as ⟦^3⟧, ⟦C1⟧, ⟦V1⟧, ⟦U1⟧, ⟦BR⟧ and ⟦P⟧ exactly, as often as it occurs in the source, at the corresponding place. ⟦^…⟧ is a footnote reference, ⟦BR⟧ a line break and ⟦P⟧ a blank line; the others stand for text that must not change.
+4. Copy every wikilink [[…]] exactly as written, including any text after |.
+5. In a Markdown link [label](⟦U1⟧) or [label][⟦U1⟧], translate the label and keep the target.
+6. Keep Markdown emphasis (*, _, **, ==, ~~) on the words that correspond to the emphasized source words.
+7. Translate faithfully and completely in the register of the source. Do not summarize, explain, annotate or add anything.
+8. Never write %% comments or block ids such as ^p12.",
+}
+`;
+
+exports[`plainPrompt > matches the snapshot for a table 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Discusión",
+  "blockKind": "table",
+  "markdown": "| Año | Título |\\n|---|---|\\n| 1932 | *Discusión* |"
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "markdown": {
+        "type": "string",
+      },
+    },
+    "required": [
+      "markdown",
+    ],
+    "type": "object",
+  },
+  "system": "You translate one Markdown block (a table) from Spanish into English for a bilingual reading edition.
+
+The user message is a JSON object with "documentTitle" for orientation, "blockKind", the block's "markdown", and possibly the reader's "extraInstructions", which you follow unless they conflict with the rules below.
+
+Return only JSON of the form {"markdown": "…"}.
+
+Rules:
+1. Keep the line structure: the same number of lines, line for line. Keep every table pipe in place and copy the delimiter row unchanged.
+2. Translate quotations too, and use English quotation marks.
+3. Copy every placeholder such as ⟦^3⟧, ⟦C1⟧, ⟦V1⟧, ⟦U1⟧, ⟦BR⟧ and ⟦P⟧ exactly, as often as it occurs in the source, at the corresponding place. ⟦^…⟧ is a footnote reference, ⟦BR⟧ a line break and ⟦P⟧ a blank line; the others stand for text that must not change.
+4. Copy every wikilink [[…]] exactly as written, including any text after |.
+5. In a Markdown link [label](⟦U1⟧) or [label][⟦U1⟧], translate the label and keep the target.
+6. Keep Markdown emphasis (*, _, **, ==, ~~) on the words that correspond to the emphasized source words.
+7. Translate faithfully and completely in the register of the source. Do not summarize, explain, annotate or add anything.
+8. Never write %% comments or block ids such as ^p12.",
+}
+`;
+
+exports[`translatePrompt > asks for and requires a callout title only for titled callouts 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Las versiones homéricas",
+  "unitKind": "callout",
+  "sentences": [
+    {
+      "n": 1,
+      "text": "Según el Sr. Pérez (cf. pp. 23-25), [[Borges, Jorge Luis|Borges]] leyó a Poe en Ginebra.⟦^1⟧"
+    },
+    {
+      "n": 2,
+      "text": "Esa lectura, dice, fue «decisiva» para *Ficciones*."
+    }
+  ],
+  "calloutTitle": "Procedencia"
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "calloutTitle": {
+        "type": "string",
+      },
+      "groups": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "markdown": {
+              "type": "string",
+            },
+            "src": {
+              "items": {
+                "minimum": 1,
+                "type": "integer",
+              },
+              "type": "array",
+            },
+          },
+          "required": [
+            "src",
+            "markdown",
+          ],
+          "type": "object",
+        },
+        "minItems": 1,
+        "type": "array",
+      },
+    },
+    "required": [
+      "groups",
+      "calloutTitle",
+    ],
+    "type": "object",
+  },
+  "system": "You translate Spanish into English for a bilingual reading edition, one block of text at a time.
+
+The user message is a JSON object:
+- "documentTitle": the work being translated, for orientation.
+- "unitKind": "paragraph", "quote" or "callout".
+- "sentences": the block to translate, as numbered sentences of Markdown.
+- "context": the previous block and its translation, if any. It is read-only: never translate or return it.
+- "calloutTitle": present only for a callout with a title; return its translation as "calloutTitle".
+- "extraInstructions": the reader's own instructions. Follow them unless they conflict with the rules below.
+
+Return only JSON of the form {"groups": [{"src": [1], "markdown": "…"}]}.
+
+Rules:
+1. Write one group per source sentence, in order. Fuse consecutive sentences into one group only when a natural translation cannot keep them apart. Never split a sentence across groups and never move words from one group's sentences into another group.
+2. Every sentence number appears in exactly one group, in ascending order. A group with an empty "src" is allowed only for words the translation must add before the first or after the last sentence, at most once.
+3. Translate quotations too, and use English quotation marks.
+4. Copy every placeholder such as ⟦^3⟧, ⟦C1⟧, ⟦V1⟧, ⟦U1⟧, ⟦BR⟧ and ⟦P⟧ exactly, as often as it occurs in the source, at the corresponding place. ⟦^…⟧ is a footnote reference, ⟦BR⟧ a line break and ⟦P⟧ a blank line; the others stand for text that must not change.
+5. Copy every wikilink [[…]] exactly as written, including any text after |.
+6. In a Markdown link [label](⟦U1⟧) or [label][⟦U1⟧], translate the label and keep the target.
+7. Keep Markdown emphasis (*, _, **, ==, ~~) on the words that correspond to the emphasized source words.
+8. Translate faithfully and completely in the register of the source. Do not summarize, explain, annotate or add anything.
+9. Never write %% comments or block ids such as ^p12.
+10. Write no heading markers (#), quote markers (>), list markers or table pipes at the start of a group, and no blank lines.",
+}
+`;
+
+exports[`translatePrompt > matches the snapshot 1`] = `
+{
+  "prompt": "{
+  "documentTitle": "Las versiones homéricas",
+  "unitKind": "paragraph",
+  "sentences": [
+    {
+      "n": 1,
+      "text": "Según el Sr. Pérez (cf. pp. 23-25), [[Borges, Jorge Luis|Borges]] leyó a Poe en Ginebra.⟦^1⟧"
+    },
+    {
+      "n": 2,
+      "text": "Esa lectura, dice, fue «decisiva» para *Ficciones*."
+    }
+  ],
+  "context": {
+    "source": "Ningún problema tan consustancial con las letras.",
+    "translation": "No problem is as consubstantial with letters."
+  },
+  "extraInstructions": "Use British spelling."
+}",
+  "schema": {
+    "additionalProperties": false,
+    "properties": {
+      "groups": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "markdown": {
+              "type": "string",
+            },
+            "src": {
+              "items": {
+                "minimum": 1,
+                "type": "integer",
+              },
+              "type": "array",
+            },
+          },
+          "required": [
+            "src",
+            "markdown",
+          ],
+          "type": "object",
+        },
+        "minItems": 1,
+        "type": "array",
+      },
+    },
+    "required": [
+      "groups",
+    ],
+    "type": "object",
+  },
+  "system": "You translate Spanish into English for a bilingual reading edition, one block of text at a time.
+
+The user message is a JSON object:
+- "documentTitle": the work being translated, for orientation.
+- "unitKind": "paragraph", "quote" or "callout".
+- "sentences": the block to translate, as numbered sentences of Markdown.
+- "context": the previous block and its translation, if any. It is read-only: never translate or return it.
+- "calloutTitle": present only for a callout with a title; return its translation as "calloutTitle".
+- "extraInstructions": the reader's own instructions. Follow them unless they conflict with the rules below.
+
+Return only JSON of the form {"groups": [{"src": [1], "markdown": "…"}]}.
+
+Rules:
+1. Write one group per source sentence, in order. Fuse consecutive sentences into one group only when a natural translation cannot keep them apart. Never split a sentence across groups and never move words from one group's sentences into another group.
+2. Every sentence number appears in exactly one group, in ascending order. A group with an empty "src" is allowed only for words the translation must add before the first or after the last sentence, at most once.
+3. Translate quotations too, and use English quotation marks.
+4. Copy every placeholder such as ⟦^3⟧, ⟦C1⟧, ⟦V1⟧, ⟦U1⟧, ⟦BR⟧ and ⟦P⟧ exactly, as often as it occurs in the source, at the corresponding place. ⟦^…⟧ is a footnote reference, ⟦BR⟧ a line break and ⟦P⟧ a blank line; the others stand for text that must not change.
+5. Copy every wikilink [[…]] exactly as written, including any text after |.
+6. In a Markdown link [label](⟦U1⟧) or [label][⟦U1⟧], translate the label and keep the target.
+7. Keep Markdown emphasis (*, _, **, ==, ~~) on the words that correspond to the emphasized source words.
+8. Translate faithfully and completely in the register of the source. Do not summarize, explain, annotate or add anything.
+9. Never write %% comments or block ids such as ^p12.
+10. Write no heading markers (#), quote markers (>), list markers or table pipes at the start of a group, and no blank lines.",
+}
+`;

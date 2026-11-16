@@ -1,0 +1,14 @@
+node_modules
+main.js
+*.js.map
+coverage/
+.DS_Store
+data.json
+.vscode/
+.idea/
+
+# Real vault notes used as local-only fixtures (copyrighted; never commit)
+test/fixtures/private/
+
+# Copyrighted texts for `npm run field`; never commit
+fixtures-private/

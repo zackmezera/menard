@@ -1,0 +1,34 @@
+{
+  "name": "menard",
+  "version": "0.0.1",
+  "description": "Read a text against its translation, aligned sentence by sentence, and translate or align pairs with Claude Code.",
+  "main": "main.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "npm run typecheck && node esbuild.config.mjs production",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "version": "node version-bump.mjs && git add manifest.json versions.json",
+    "field": "vitest run --config vitest.field.config.ts"
+  },
+  "author": "Zack Mezera",
+  "license": "MIT",
+  "devDependencies": {
+    "@codemirror/state": "6.5.0",
+    "@codemirror/view": "6.38.6",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.5",
+    "esbuild": "^0.28.2",
+    "eslint": "^9.39.5",
+    "eslint-plugin-obsidianmd": "^0.4.2",
+    "globals": "^17.13.0",
+    "happy-dom": "^20.14.5",
+    "obsidian": "^1.13.1",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}

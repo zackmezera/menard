@@ -1,0 +1,10 @@
+{
+  "id": "menard",
+  "name": "Menard",
+  "version": "0.0.1",
+  "minAppVersion": "1.13.0",
+  "description": "Read a text against its translation, aligned sentence by sentence, and translate or align pairs with Claude Code.",
+  "author": "Zack Mezera",
+  "authorUrl": "https://github.com/zackmezera",
+  "isDesktopOnly": true
+}
